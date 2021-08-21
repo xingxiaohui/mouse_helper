@@ -7,38 +7,40 @@ from tkinter import END
 
 from mouse_helper import main
 
-titles = {'kylin': '觉醒副本', 'orochi': '御魂副本', 'troops': '组队副本', 'linshi': '临时活动'}
+titles = {'create_script': '录制脚本', 'run_script': '执行脚本'}
 
 
 class ThreadInitiator(threading.Thread):
-    def __init__(self, target, log):
+    def __init__(self, app, target, file_path, log, loop_flag, cheat_flag):
         threading.Thread.__init__(self)
         self.flag = True
         self.target = target
+        self.file_path = file_path
+        self.loop_flag = loop_flag
+        self.cheat_flag = cheat_flag
         self.log = log
+        self.app = app
 
     def run(self):
-        count = 1
         self.log.insert(END,
                         time.strftime('%Y-%m-%d %H:%M:%S ',
-                                      time.localtime(time.time())) + '开始挑战'+titles[str(self.target)]+'\n')
-        while self.flag:
-            self.log.see(END)
-            if self.target == 'kylin':
-                main.kylin()
-            elif self.target == 'orochi':
-                main.orochi()
-            elif self.target == 'troops':
-                main.troops()
-            elif self.target == 'linshi':
-                main.linshi()
-            if count > 60:
-                self.log.delete(1.0, END)  # 使用 delete
-                self.log.insert(END, ' 清空日志\n')
+                                      time.localtime(time.time())) + '开始' + titles[str(self.target)] + '\n')
+        if self.target == 'create_script':
+            main.create_script(self.app, self.file_path, log=self.log)
+        if self.target == 'run_script':
+            while self.flag:
                 self.log.see(END)
+                if self.target == 'run_script':
+                    main.run_script(self.app, self.file_path, self.cheat_flag, log=self.log)
+                # 退出循环
+                print('self.loop_flag')
+                print(self.loop_flag)
+                if self.loop_flag == 0:
+                    self.flag = False
+
         self.log.insert(END,
                         time.strftime('%Y-%m-%d %H:%M:%S ',
-                                      time.localtime(time.time())) + '结束挑战\n')
+                                      time.localtime(time.time())) + '结束操作\n')
         self.log.see(END)
 
     def stop(self):
