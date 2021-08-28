@@ -7,9 +7,7 @@ import random
 import time
 
 import pyautogui
-import pynput
 from mouse_helper import utils
-from mouse_helper import config
 import json
 from tkinter import END
 ## 监听鼠标
@@ -58,7 +56,7 @@ def on_release(key):
 
 # 录制脚本
 def create_script(app, path, log):
-    log.insert(END, '倒计时5秒后开始录制鼠标点击')
+    log.insert(END, '倒计时5秒后开始录制鼠标点击\n')
     time.sleep(5)
     app.iconify()  # 最小化窗口
     global action_list
@@ -90,10 +88,7 @@ def stop_script():
 
 # 执行脚本
 def run_script(app, path, cheat_flag, log):
-    log.insert(END, '倒计时5秒后开始执行鼠标点击')
     num = 0
-    time.sleep(5)
-    app.iconify()  # 最小化窗口
     with open(path, 'r') as f:
         load_data = json.load(f)
         data = load_data.get("steps")
@@ -141,3 +136,35 @@ def cheat_click(target):
         times = random.randint(1, 2)
         interval_time = random.randint(8, 30)
         pyautogui.click(clicks=times, interval=interval_time / 100)
+
+
+# 执行图片点击
+def image_click(app, cheat_flag, image_list, log):
+    for image in image_list:
+        num = 0
+        if cheat_flag == 1:
+            pos = utils.find_and_click(image, 5)
+        else:
+            pos = utils.find_and_click(image, 1)
+        if pos is not None:
+            x, y = pos
+            log.insert(END, '找到并点击了( {:.2f}, {:.2f})\n'.format(x, y))
+            num+1
+            if num > 60:
+                log.delete(1.0, END)  # 使用 delete
+                log.insert(END, ' 清空日志\n')
+                log.see(END)
+
+
+# 根据文件路径查出
+def get_image_path_list(path):
+    image_list = []
+    for file in os.listdir(path):
+        image_path = os.path.join(path, file)
+        if os.path.splitext(image_path)[1] == '.jpeg':
+            image_list.append(image_path)
+        elif os.path.splitext(image_path)[1] == '.jpg':
+            image_list.append(image_path)
+        elif os.path.splitext(image_path)[1] == '.png':
+            image_list.append(image_path)
+    return image_list
