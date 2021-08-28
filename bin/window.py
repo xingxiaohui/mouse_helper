@@ -9,6 +9,7 @@ from mouse_helper.thread_initiator import ThreadInitiator
 import tkinter as tk
 from tkinter import *
 from tkinter import scrolledtext
+from tkinter import messagebox
 
 # 导入消息对话框子模块
 import tkinter.filedialog
@@ -17,10 +18,14 @@ tasks = []
 
 
 # 新建脚本
-def create_script(app, min_flag, log):
+def create_script(app, log):
     target = "create_script"
     # 获取文件路径
     file_path = tkinter.filedialog.asksaveasfilename()  # 选择保存文件路径
+    if ".json" not in file_path:
+        messagebox.showwarning('警告', '请创建正确的json文件')
+        log.insert(END, 'json脚本文件创建有误请重新创建 **.json 来存储\n')
+        return
     threadInitiator = ThreadInitiator(app, target, file_path, log, 0, 0, 1)
     threadInitiator.start()    # 开启新线程
     tasks.append(threadInitiator)    # 记录在运行的线程
@@ -31,6 +36,10 @@ def run_script(app, loop_flag, cheat_flag, min_flag, log):
     target = "run_script"
     # 获取文件路径
     file_path = tkinter.filedialog.askopenfilename()
+    if ".json" not in file_path:
+        messagebox.showwarning('警告', '请选择正确的json文件')
+        log.insert(END, 'json脚本文件选择有误请重新选择 **.json 来运行\n')
+        return
     print(file_path)
     # 创建新线程
     threadInitiator = ThreadInitiator(app, target, file_path, log, loop_flag.get(), cheat_flag.get(), min_flag.get())
@@ -45,6 +54,10 @@ def image_click(app, loop_flag, cheat_flag, min_flag, log):
     target = "image_click"
     # 获取文件路径
     file_path = tkinter.filedialog.askdirectory()
+    if ".json" not in file_path:
+        messagebox.showwarning('警告', '请选择正确的文件夹')
+        log.insert(END, '文件夹选择有误请重新选择运行\n')
+        return
     # 创建新线程
     threadInitiator = ThreadInitiator(app, target, file_path, log, loop_flag.get(), cheat_flag.get(), min_flag.get())
     # 开启新线程
@@ -97,9 +110,9 @@ class Window:
         frame2.pack(side=RIGHT, fill=BOTH, expand=YES)
         Button(frame1, command=lambda: create_script(self.app, log=t3), text='创建脚本', width=20).pack(
             side=TOP, expand=YES)
-        Button(frame1, command=lambda: run_script(self.app, self.loop_flag, self.cheat_flag, log=t3), text='运行脚本', width = 20).pack(
+        Button(frame1, command=lambda: run_script(self.app, self.loop_flag, self.cheat_flag, self.min_flag, log=t3), text='运行脚本', width = 20).pack(
             side=TOP, expand=YES)
-        Button(frame1, command=lambda: image_click(self.app, self.loop_flag, self.cheat_flag, self.min_flag,log=t3), text='运行截图点击', width=20).pack(
+        Button(frame1, command=lambda: image_click(self.app, self.loop_flag, self.cheat_flag, self.min_flag, log=t3), text='运行截图点击', width=20).pack(
             side=TOP, expand=YES)
         Checkbutton(frame1, text='循环执行', variable=self.loop_flag, onvalue=1, offvalue=0).pack(side=TOP, anchor='w')
         Checkbutton(frame1, text='随机偏移', variable=self.cheat_flag, onvalue=1, offvalue=0).pack(side=TOP, anchor='w')
