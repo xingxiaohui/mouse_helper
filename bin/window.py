@@ -54,7 +54,7 @@ def image_click(app, loop_flag, cheat_flag, min_flag, log):
     target = "image_click"
     # 获取文件路径
     file_path = tkinter.filedialog.askdirectory()
-    if ".json" not in file_path:
+    if len(file_path) == 0:
         messagebox.showwarning('警告', '请选择正确的文件夹')
         log.insert(END, '文件夹选择有误请重新选择运行\n')
         return
